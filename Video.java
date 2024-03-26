@@ -13,14 +13,15 @@ public class Video
 {
 	static int	impermin=720,
 		denseness=6,filling=5,dotsize=20, //drawingspecs
-			width=2560/2,height=1440/2,
+			width=1080,height=1080,//2560,height=1440,//
 			black=Color.black.getRGB(),
 		start=0;//where does the enumeration of the files start
 	static boolean empty=false;//Is the middle of polygons not drawn?	
-	static double faintness=4,range=6; 
-	static String name= "edge",//"tetrahedron",//
+	static double faintness=4,//4.75,//
+			range=5.3;//6.25;//2; 
+	static String name="tetrahedron",//"honey",//"honeycomb",// "edge",//
 			format="png";
-	static Color color=randomColorMatt(70); //new Color(71,19,56);//
+	static Color color=new Color(166,162,98);//randomColorMatt(70); //
 
 
 public static void main(String[] args)
@@ -33,7 +34,7 @@ public static void main(String[] args)
 	Honeycomb.denseness=denseness;
 	Honeycomb.filling=Cellcomplex.filling;
 	Honeycomb.empty=Cellcomplex.empty;
-	double sqrt=Math.sqrt(4);
+	double sqrt=Math.sqrt(2);
 
 
 	
@@ -44,21 +45,23 @@ public static void main(String[] args)
 	Point.still=false;
 	
 	DecimalFormat df=new DecimalFormat("0000"); 
-	
-	Honeycomb honey=Polychoron.tilingnce(7,3,5,faintness);//(4,4,3,5);//
+	Honeycomb honey=Polychoron.archimedean("pyramid", new int[] {10,10,10,10,10,3,3,3,3,3},new int[] {0,1,1,1,1,1},  faintness);
+					//Polychoron.tilingnce(4,4,3,6);//(7,3,5,faintness);//
+					//Polychoron.modify("rect",6,3,3,faintness);//
 
-	Observer.range=range;//8;//
+	Observer.range=range;//*3.2114;//8;//
 	Observer.background=color;
 
-	for(int i=0;i<2*impermin;i++)
+	for(int i=0;i<2*impermin;i++)//for(int i=2334;i<2243+1000;i++)
 	{ 
 		//set up observer: psi changes the slope if its path
-			double phi=i*Math.PI/impermin+0*Math.PI, psi=Math.PI/5;//Math.PI/3;//
+			double phi=i*Math.PI/impermin+0*Math.PI, psi=Math.PI/3;//Math.PI/impermin/10*i;//
 			line=new Line(Point.zero,new Minkowski(Math.cos(phi),Math.sin(phi)*Math.cos(psi),Math.sin(phi)*Math.sin(psi),0),sqrt);
-			right=new Minkowski(-Math.sin(phi),Math.cos(phi)*Math.cos(psi),Math.cos(phi)*Math.sin(psi),0).transport(-1, line);
+			//right=new Minkowski(-Math.sin(phi),Math.cos(phi)*Math.cos(psi),Math.cos(phi)*Math.sin(psi),0).transport(-1, line);//right=direction of movement
+			right=new Minkowski(0,-Math.sin(psi),Math.cos(psi),0).transport(-1, line);
 			line=line.transport(-1);
 			eye=new Observer(line,right,width,height,Math.PI/3);
-		
+	//	Observer.range*=1.0005;
 	//setup image
 		BufferedImage image=eye.setup(color.getRGB());
 		double[][] zBuffer=eye.InitiateBuffer();

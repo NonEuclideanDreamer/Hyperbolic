@@ -75,8 +75,6 @@ public class Cellcomplex
 				eye.drawLine(image, zBuffer, line, 1);
 			}
 		}
-		int to;
-		if(sidepoint[0].length==3)to=56; else to=30;
 		System.out.print("faces");
 		for(i=0;i<center.length;i++)
 		{
@@ -118,7 +116,6 @@ public class Cellcomplex
 	{
 		int n=sidepoint.length,
 			l=sidepoint[0].length;
-		double s=vertex[sidepoint[0][2]].distance(vertex[sidepoint[0][1]]);
 		boolean even=(l%2==0);
 		Point[]c=new Point[n];
 		if(even)
@@ -279,6 +276,11 @@ public class Cellcomplex
 			}
 		}
 	}
+	
+	/*int[][]sideedge()
+	{
+		
+	}*/
 	
 	//*****************************
 	//inverse of sinus hyperbolicus

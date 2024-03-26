@@ -201,7 +201,7 @@ public class Observer
 		if(flatscreen) 
 		{
 			int xPixel, yPixel;
-			Minkowski direction=position().direction(point),scrrencomp;
+			Minkowski direction=position().direction(point);
 			radial=Math.abs(getForward().angle(point));
 			depth=point.distance(position());
 			

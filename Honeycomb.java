@@ -13,6 +13,7 @@ public class Honeycomb
 	static double denseness=10;
 	static Cellcomplex vf;//vertexfigure
 	static double[][]vfd;//vertexfigure distances
+	static int[] edgetype;//are there "equivalent edges" in the vertexfigure?
 	static int filling=3;
 	static boolean empty=false;
 	ArrayList<Point> vertex=new ArrayList<Point>(),
@@ -48,7 +49,7 @@ public class Honeycomb
 		{
 			int n=edgepoint.size();
 		//	System.out.println("new edge nr"+n+":"+i+", "+j+" ,length="+vertex.get(i).distance(vertex.get(j)));
-			System.out.println("new edge nr"+n+":"+i+", "+j+" ,length="+vertex.get(i).distance(vertex.get(j)));
+		//	System.out.println("new edge nr"+n+":"+i+", "+j+" ,length="+vertex.get(i).distance(vertex.get(j)));
 
 			edgepoint.add(new int[] {i,j});
 			/*if(pointedge.get(i)[0]==-1)	pointedge.get(i)[0]=n;
@@ -106,7 +107,7 @@ public class Honeycomb
 				}
 				if(fits)
 				{pointedge.get(i)[k]=n;
-				System.out.println("pointedge("+i+","+k+")="+n);
+			//	System.out.println("pointedge("+i+","+k+")="+n);
 				done=true;}
 				
 				else k++;
@@ -144,7 +145,7 @@ public class Honeycomb
 				}
 				if(fits)
 				{pointedge.get(j)[k]=n;
-				System.out.println("pointedge("+j+","+k+")="+n);
+				//System.out.println("pointedge("+j+","+k+")="+n);
 				done=true;}
 				else k++;
 			}
@@ -207,16 +208,16 @@ public class Honeycomb
 		public int addFace(Point c, int[] sid) 
 		{
 			int out=center.size();
-			
+			int nside=vf.edgepoint.length;
 			center.add(c);
 			sidepoint.add(sid);
-			
 			for(int i=0;i<sid.length;i++)
 			{
 				int l=0;
-				while(!edgeinface(pointedge.get(sid[i])[vf.edgepoint[l][0]],out)||!edgeinface(pointedge.get(sid[i])[vf.edgepoint[l][1]],out))l++;
+				while(!edgeinface(pointedge.get(sid[i])[vf.edgepoint[l][0]],out)||!edgeinface(pointedge.get(sid[i])[vf.edgepoint[l][1]],out)) {l++;if(l==nside) {System.out.println("failed finding pointside loc for "+i); center.removeLast(); sidepoint.removeLast(); return out-1;}}
 				pointside.get(sid[i])[l]=out;
 			}
+			
 			
 			return out;
 		}
@@ -339,4 +340,292 @@ public class Honeycomb
 					}
 				}
 			}
+			
+			public int getAltEdgeNr(int vertex,int edge)
+			{
+				int other=getEndCor(vertex,edge);
+				
+				for(int i=0;i<vf.vertex.length;i++)
+				{
+					if(getEndCor(other,i)==vertex)return i;
+				}
+
+			return -1;
+			}
+
+
+			public void addarchEdge(int i, int j, int et) 
+			{
+				int n=edgepoint.size();
+					System.out.println("new edge nr"+n+":"+i+", "+j+" ,length="+vertex.get(i).distance(vertex.get(j)));
+				int nedge=pointedge.get(0).length;
+					edgepoint.add(new int[] {i,j});
+
+					boolean done =false;
+					int k=0;
+					while(!done)
+					{
+						if(k==nedge)return;
+						while(pointedge.get(i)[k]>-1 ||edgetype[k]!=et) {k++;if(k==nedge)return;}//System.out.println("edge nr"+k+" of vertex "+i+" is "+pointedge.get(i)[k]);
+						int l=0;
+
+						boolean fits=true;
+						Point p1=vertex.get(j);
+						while(l<k&&fits)
+						{
+							if(pointedge.get(i)[l]>-1)
+							{
+							//	System.out.println("distance end of edge "+l+" of vertex "+i+"(which is "+getEndCor(i,l)+") = "+Math.abs(p1.distance(getEnd(i, l))));
+
+								if(Math.abs(p1.distance(getEnd(i, l))-vfd[k][l])>0.02)fits=false;
+								else l++;
+							}
+							else l++;
+						}
+						
+						if(fits)
+						{
+							l++;
+							while(l<nedge&&fits)
+							{
+								if(pointedge.get(i)[l]>-1)
+								{
+									if(Math.abs(p1.distance(getEnd(i, l))-vfd[l][k])>0.02)fits=false;
+									else l++;
+								}
+								else l++;
+							}
+						}
+						if(fits)
+						{pointedge.get(i)[k]=n;
+						System.out.println("pointedge("+i+","+k+")="+n);
+						done=true;}
+						
+						else k++;
+					}
+					done =false;
+				
+					 k=0;
+					while(!done)
+					{
+						if(k==nedge)return;
+						while(pointedge.get(j)[k]>-1||edgetype[k]!=et) {k++;if(k==nedge)return;}
+						int l=0;
+						boolean fits=true;
+						Point p1=vertex.get(i);
+						while(l<k&&fits)
+						{
+							if(pointedge.get(j)[l]>-1)
+							{
+								System.out.println("distance end of edge "+l+" of vertex "+j+" = "+Math.abs(p1.distance(getEnd(j, l))));
+								if(Math.abs(p1.distance(getEnd(j, l))-vfd[k][l])>0.02 )fits=false;
+								else l++;
+							}
+							else l++;
+						}
+						if(fits)
+						{
+							l++;
+							while(l<nedge&&fits)
+							{
+								if(pointedge.get(j)[l]>-1)
+								{
+									if(Math.abs(p1.distance(getEnd(j, l))-vfd[l][k])>0.02)fits=false;
+									else l++;
+								}
+								else l++;
+							}
+						}
+						if(fits)
+						{
+							pointedge.get(j)[k]=n;
+						System.out.println("pointedge("+j+","+k+")="+n);
+						done=true;}
+						else k++;
+					}
+				}
+				
+			//for snubcases were the edgetype isn't consistent
+			public void addarchEdge(int i, int j, int et,int et2) 
+			{
+				int n=edgepoint.size();
+					System.out.println("new edge nr"+n+":"+i+", "+j+" ,length="+vertex.get(i).distance(vertex.get(j))+", et="+et+", "+et2);
+				int nedge=pointedge.get(0).length;
+					edgepoint.add(new int[] {i,j});
+
+					boolean done =false;
+					int k=0;
+					while(!done)
+					{
+						if(k==nedge)return;
+						while(pointedge.get(i)[k]>-1 ||edgetype[k]!=et) {System.out.println("edge nr"+k+" of vertex "+i+" is "+pointedge.get(i)[k]);k++;if(k==nedge)return;}//
+						int l=0;
+
+						boolean fits=true;
+						Point p1=vertex.get(j);
+						while(l<k&&fits)
+						{
+							if(pointedge.get(i)[l]>-1)
+							{
+								System.out.println("distance end of edge "+l+" of vertex "+i+"(which is "+getEndCor(i,l)+") = "+Math.abs(p1.distance(getEnd(i, l)))+", dist to edge "+k+" should be "+vfd[k][l]);
+								
+								if(Math.abs(p1.distance(getEnd(i, l))-vfd[k][l])>0.02)fits=false;
+								else l++;
+							}
+							else l++;
+						}
+						
+						if(fits)
+						{
+							l++;
+							while(l<nedge&&fits)
+							{
+								if(pointedge.get(i)[l]>-1)
+								{
+								//	System.out.println("distance end of edge "+l+" of vertex "+i+"(which is "+getEndCor(i,l)+") = "+Math.abs(p1.distance(getEnd(i, l))));
+
+									if(Math.abs(p1.distance(getEnd(i, l))-vfd[l][k])>0.02)fits=false;
+									else l++;
+								}
+								else l++;
+							}
+						}
+						if(fits)
+						{pointedge.get(i)[k]=n;
+					//	System.out.println("pointedge("+i+","+k+")="+n);
+						done=true;}
+						
+						else k++;
+					}
+					done =false;
+				
+					 k=0;
+					while(!done)
+					{
+						if(k==nedge)return;
+						while(pointedge.get(j)[k]>-1||edgetype[k]!=et2) {k++;if(k==nedge)return;}
+						int l=0;
+						boolean fits=true;
+						Point p1=vertex.get(i);
+						while(l<k&&fits)
+						{
+							if(pointedge.get(j)[l]>-1)
+							{
+								//System.out.println("distance end of edge "+l+" of vertex "+j+" = "+Math.abs(p1.distance(getEnd(j, l))));
+								if(Math.abs(p1.distance(getEnd(j, l))-vfd[k][l])>0.02 )fits=false;
+								else l++;
+							}
+							else l++;
+						}
+						if(fits)
+						{
+							l++;
+							while(l<nedge&&fits)
+							{
+								if(pointedge.get(j)[l]>-1)
+								{
+									if(Math.abs(p1.distance(getEnd(j, l))-vfd[l][k])>0.02)fits=false;
+									else l++;
+								}
+								else l++;
+							}
+						}
+						if(fits)
+						{
+							pointedge.get(j)[k]=n;
+					//	System.out.println("pointedge("+j+","+k+")="+n);
+						done=true;}
+						else k++;
+					}
+				}
+			public void addlateEdge(int i, int j, int et) 
+			{
+				int n=edgepoint.size();
+				//	System.out.println("new edge nr"+n+":"+i+", "+j+" ,length="+vertex.get(i).distance(vertex.get(j)));
+				int nedge=pointedge.get(0).length;
+					edgepoint.add(new int[] {i,j});
+
+					boolean done =false;
+					int k=5;
+					while(!done)
+					{
+						if(k==nedge)return;
+						while(pointedge.get(i)[k]>-1 ||edgetype[k]!=et) {k++;if(k==nedge)return;}//System.out.println("edge nr"+k+" of vertex "+i+" is "+pointedge.get(i)[k]);
+						int l=0;
+
+						boolean fits=true;
+						Point p1=vertex.get(j);
+						while(l<k&&fits)
+						{
+							if(pointedge.get(i)[l]>-1)
+							{
+							//	System.out.println("distance end of edge "+l+" of vertex "+i+"(which is "+getEndCor(i,l)+") = "+Math.abs(p1.distance(getEnd(i, l))));
+
+								if(Math.abs(p1.distance(getEnd(i, l))-vfd[k][l])>0.02)fits=false;
+								else l++;
+							}
+							else l++;
+						}
+						
+						if(fits)
+						{
+							l++;
+							while(l<nedge&&fits)
+							{
+								if(pointedge.get(i)[l]>-1)
+								{
+									if(Math.abs(p1.distance(getEnd(i, l))-vfd[l][k])>0.02)fits=false;
+									else l++;
+								}
+								else l++;
+							}
+						}
+						if(fits)
+						{pointedge.get(i)[k]=n;
+						//System.out.println("pointedge("+i+","+k+")="+n);
+						done=true;}
+						
+						else k++;
+					}
+					done =false;
+				
+					 k=5;
+					while(!done)
+					{
+						if(k==nedge)return;
+						while(pointedge.get(j)[k]>-1||edgetype[k]!=et) {k++;if(k==nedge)return;}
+						int l=0;
+						boolean fits=true;
+						Point p1=vertex.get(i);
+						while(l<k&&fits)
+						{
+							if(pointedge.get(j)[l]>-1)
+							{
+							//	System.out.println("distance end of edge "+l+" of vertex "+j+" = "+Math.abs(p1.distance(getEnd(j, l))));
+								if(Math.abs(p1.distance(getEnd(j, l))-vfd[k][l])>0.02 )fits=false;
+								else l++;
+							}
+							else l++;
+						}
+						if(fits)
+						{
+							l++;
+							while(l<nedge&&fits)
+							{
+								if(pointedge.get(j)[l]>-1)
+								{
+									if(Math.abs(p1.distance(getEnd(j, l))-vfd[l][k])>0.02)fits=false;
+									else l++;
+								}
+								else l++;
+							}
+						}
+						if(fits)
+						{
+							pointedge.get(j)[k]=n;
+					//	System.out.println("pointedge("+j+","+k+")="+n);
+						done=true;}
+						else k++;
+					}
+				}
 }

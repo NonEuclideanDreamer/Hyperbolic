@@ -1,7 +1,7 @@
 //***************************************************
-// Minkowski.java
+// E4.java
 // @author Non-Euclidean Dreamer
-// Describes vectors in 4-dimensional Minkowski-SpaceTime, but also includes methods to interpret them as Euclidean vectors
+// Describes points/vectors in 4-dimensional Euclidian space
 //***************************************************
 
 import java.awt.Color;
@@ -16,7 +16,7 @@ public class Minkowski
 	private double x; // x-coordinate
 	private double y; // y-coordinate
 	private double z; // z-coordinate
-	private double t; // time-coordinate
+	private double w; // 4d-coordinate
 	private int color; // the point's color as an rgb-value
 	
 	//base vectors
@@ -37,13 +37,9 @@ public class Minkowski
 		x=0;
 		y=0;
 		z=0;
-		t=0;
+		w=0;
 		color=black;
 	}
-	
-	//***********************************
-	// vector defined in polar coordinates
-	//*************************************
 	public static Minkowski polar(double r,double phi,double psi,double theta)
 	{
 		return new Minkowski(r*Math.cos(phi)*Math.cos(psi)*Math.cos(theta),r*Math.sin(phi)*Math.cos(psi)*Math.cos(theta),r*Math.sin(psi)*Math.cos(theta),Math.sin(theta));
@@ -52,24 +48,24 @@ public class Minkowski
 	//********************************************
 	// Constructor: Set chosen values, black
 	//********************************************
-	public Minkowski (double newx, double newy, double newz, double newt)
+	public Minkowski (double newx, double newy, double newz, double neww)
 	{
 		x=newx;
 		y=newy;
 		z=newz;
-		t=newt;
+		w=neww;
 		color=black;
 	}
 	
 	//**********************************************
 	// Constructor:  Set chosen values, including color
 	//***********************************************
-	public Minkowski (double newx, double newy, double newz, double newt, int newcolor)
+	public Minkowski (double newx, double newy, double newz, double neww, int newcolor)
 	{
 		x=newx;
 		y=newy;
 		z=newz;
-		t=newt;
+		w=neww;
 		color=newcolor;
 	}
 	
@@ -81,7 +77,7 @@ public class Minkowski
 		x=v[0];
 		y=v[1];
 		z=v[2];
-		t=v[3];
+		w=v[3];
 		color=white;
 	}
 
@@ -117,15 +113,15 @@ public class Minkowski
 		if(i==0)return x;
 		if(i==1)return y;
 		if(i==2)return z;
-		else return t;
+		else return w;
 	}
 	
 	//***************************************************
 	// Returns the w-coordinate of the given point
 	//***************************************************
-	public double getT ()
+	public double getW ()
 	{
-		return t;
+		return w;
 	}	
 	
 	//***************************************************
@@ -163,9 +159,9 @@ public class Minkowski
 	//***************************************************
 	// Sets the w-coordinate of the given point to the given value
 	//***************************************************
-	public void setW (double newt)
+	public void setW (double neww)
 	{
-		t=newt;
+		w=neww;
 	}	
 	
 	//***************************************************
@@ -181,7 +177,7 @@ public class Minkowski
 	//*****************************************************
 	public Minkowski copy()
 	{
-		return new Minkowski(x,y,z,t);
+		return new Minkowski(x,y,z,w);
 	}
 	
 	//*****************************************************
@@ -189,7 +185,7 @@ public class Minkowski
 	//*****************************************************
 	public double norm ()
 	{
-		return Math.sqrt(Math.pow(x, 2)+Math.pow(y, 2)+Math.pow(z, 2)+Math.pow(t, 2));
+		return Math.sqrt(Math.pow(x, 2)+Math.pow(y, 2)+Math.pow(z, 2)+Math.pow(w, 2));
 	}
 	
 	//*****************************************************
@@ -197,7 +193,7 @@ public class Minkowski
 	//*******************************************************
 	public double dot(Minkowski point)
 	{
-		return x*point.x+y*point.y+z*point.z+t*point.t;
+		return x*point.x+y*point.y+z*point.z+w*point.w;
 	}
 	
 	//*****************************************************
@@ -205,7 +201,7 @@ public class Minkowski
 	//*****************************************************
 	public Minkowski times(double scalar)
 	{
-		Minkowski output=new Minkowski(scalar*x,scalar*y,scalar*z,scalar*t, color);
+		Minkowski output=new Minkowski(scalar*x,scalar*y,scalar*z,scalar*w, color);
 		return output;
 	}
 	
@@ -214,7 +210,7 @@ public class Minkowski
 	//*******************************************************
 	public Minkowski add (Minkowski vector)
 	{
-		Minkowski sum=new Minkowski(x+vector.x,y+vector.y,z+vector.z,t+vector.t);
+		Minkowski sum=new Minkowski(x+vector.x,y+vector.y,z+vector.z,w+vector.w);
 		return sum;
 	}
 
@@ -236,7 +232,7 @@ public class Minkowski
 	}
 	
 	//*****************************************************
-	// Returns the Euclidean parallel component of vector
+	// Returns the parallel component of vector
 	//*****************************************************
 	public Minkowski paraComp(Minkowski vector)
 	{
@@ -246,7 +242,7 @@ public class Minkowski
 	}
 	
 	//*****************************************************
-	// Returns the Euclidean normal component of vector
+	// Returns the normal component of vector
 	//*****************************************************
 	public Minkowski normComp(Minkowski vector)
 	{
@@ -265,11 +261,11 @@ public class Minkowski
 	}
 	
 	//********************************************************
-	// Returns Minkowski quadratic form (hyperbolic norm squared)
+	// Returns Minkowski quadratic form
 	//********************************************************
 	public double minkform()
 	{
-		return x*x+y*y+z*z-t*t;
+		return x*x+y*y+z*z-w*w;
 	}
 	
 	//*******************************************************
@@ -281,9 +277,6 @@ public class Minkowski
 		return new Point(unit.x,unit.y,unit.z,unit.color);
 	}
 	
-	//**************************
-	// inverse cosine hyperbolicus
-	//******************************
 	 static double acosh(double x) 
 	{
 		if(x<1)
@@ -292,20 +285,16 @@ public class Minkowski
 		else return Math.log(x+Math.sqrt(x*x-1));
 	}
 
-	 
-	 //********************************
-	 // set Minkowskinorm to +-1
-	 //********************************
 	public Minkowski hnormalize() 
 	{
 		double q=minkform();
 		if(q<0)
 		{
 			q=Math.sqrt(-q);
-			return new Minkowski(x/q,y/q,z/q,t/q);
+			return new Minkowski(x/q,y/q,z/q,w/q);
 		}
 		q=Math.sqrt(q);
-		return new Minkowski(x/q,y/q,z/q,t/q);
+		return new Minkowski(x/q,y/q,z/q,w/q);
 	}
 
 	//************************************************************
@@ -313,14 +302,14 @@ public class Minkowski
 	//***********************************************************
 	public double det(Minkowski col1, Minkowski col2, Minkowski col3)
 	{
-		return x*(col1.getY()*col2.getZ()*col3.getT()+col1.getZ()*col2.getT()*col3.getY()+
-				col1.getT()*col2.getY()*col3.getZ()-col3.getY()*col2.getZ()*col1.getT()-col3.getZ()*col2.getT()*col1.getY()-
-				col3.getT()*col2.getY()*col1.getZ())-y*(col1.getX()*col2.getZ()*col3.getT()+
-				col1.getZ()*col2.getT()*col3.getX()+col1.getT()*col2.getX()*col3.getZ()-
-				col3.getX()*col2.getZ()*col1.getT()-col3.getZ()*col2.getT()*col1.getX()-
-				col3.getT()*col2.getX()*col1.getZ())+z*(col1.getX()*col2.getY()*col3.getT()+
-				col1.getY()*col2.getT()*col3.getX()+col1.getT()*col2.getX()*col3.getY()-col3.getX()*col2.getY()*col1.getT()-
-				col3.getY()*col2.getT()*col1.getX()-col3.getT()*col2.getX()*col1.getY())-t*
+		return x*(col1.getY()*col2.getZ()*col3.getW()+col1.getZ()*col2.getW()*col3.getY()+
+				col1.getW()*col2.getY()*col3.getZ()-col3.getY()*col2.getZ()*col1.getW()-col3.getZ()*col2.getW()*col1.getY()-
+				col3.getW()*col2.getY()*col1.getZ())-y*(col1.getX()*col2.getZ()*col3.getW()+
+				col1.getZ()*col2.getW()*col3.getX()+col1.getW()*col2.getX()*col3.getZ()-
+				col3.getX()*col2.getZ()*col1.getW()-col3.getZ()*col2.getW()*col1.getX()-
+				col3.getW()*col2.getX()*col1.getZ())+z*(col1.getX()*col2.getY()*col3.getW()+
+				col1.getY()*col2.getW()*col3.getX()+col1.getW()*col2.getX()*col3.getY()-col3.getX()*col2.getY()*col1.getW()-
+				col3.getY()*col2.getW()*col1.getX()-col3.getW()*col2.getX()*col1.getY())-w*
 				(col1.getX()*col2.getY()*col3.getZ()+col1.getY()*col2.getZ()*col3.getX()+
 				col1.getZ()*col2.getX()*col3.getY()-col3.getX()*col2.getY()*col1.getZ()-col3.getY()*col2.getZ()*col1.getX()-
 				col3.getZ()*col2.getX()*col1.getY());
@@ -416,7 +405,7 @@ public class Minkowski
 		array[0]=x;
 		array[1]=y;
 		array[2]=z;
-		array[3]=t;
+		array[3]=w;
 		return array;
 	}
 	
@@ -429,7 +418,7 @@ public class Minkowski
 		x=vector.x;
 		y=vector.y;
 		z=vector.z;
-		t=vector.t;
+		w=vector.w;
 	}
 	
 	//********************************************************
@@ -445,9 +434,8 @@ public class Minkowski
 		return newvector;
 		
 	}
-	
 	//********************************************************
-	// Transports the vector by t along the given geodesic mirroring it in the geodesics direction
+	// Transports the vector by t along the given geodesic mirriring it in the geodesics direction
 	//********************************************************
 	public Minkowski mirrortransport(double t, Line geodesic)
 	{
@@ -459,9 +447,7 @@ public class Minkowski
 		return newvector;
 		
 	}
-	//**************************************
-	//normal component of this vector wrt the geodesic in minkowski metric
-	//***************************************************
+	
 	public Minkowski hnormcomp(Line geodesic)
 	{
 		Minkowski momentum=geodesic.getMomentum();
@@ -469,10 +455,6 @@ public class Minkowski
 		Minkowski parcomp=momentum.times(s),normcomp=add(parcomp.times(-1));
 		return normcomp;
 	}
-	
-	//***********************************************************
-	//parallel component of this vector wrt the geodesic in minkowski metric
-	//***************************************************
 	public Minkowski hparcomp(Line geodesic)
 	{
 		Minkowski momentum=geodesic.getMomentum();
@@ -481,20 +463,12 @@ public class Minkowski
 		return parcomp;
 	}
 	
-	//**************************************
-	//normal component of this vector wrt the momentum in minkowski metric
-	//***************************************************
 	public Minkowski hnormcomp(Minkowski momentum)
 	{
 		double s=hdot(momentum);
 		Minkowski parcomp=momentum.times(s),normcomp=add(parcomp.times(-1));
 		return normcomp;
 	}
-	
-	
-	//***********************************************************
-	//parallel component of this vector wrt the momentum in minkowski metric
-	//***************************************************
 	public Minkowski hparcomp(Minkowski momentum)
 	{
 		double s=hdot(momentum);
@@ -524,7 +498,7 @@ public class Minkowski
 	//******************************
 	public void println()
 	{
-		System.out.println("vector: ("+x+", "+y+", "+z+", "+t+")");
+		System.out.println("vector: ("+x+", "+y+", "+z+", "+w+")");
 	}
 
 	//****************************
@@ -541,12 +515,15 @@ public class Minkowski
 		return new Minkowski(v);
 	}
 
-	//************************
-	//minkowski-scalar product
-	//************************
 	public double hdot(Minkowski v) 
 	{
-		return x*v.x+y*v.y+z*v.z-t*v.t;
+		return x*v.x+y*v.y+z*v.z-w*v.w;
+	}
+	
+	// the component parallel to mirdir is mirrored, the rest remains
+	public Minkowski mirror(Minkowski mirdir) 
+	{
+		return hnormcomp(mirdir).add(hparcomp(mirdir).times(-1));
 	}
 
 
