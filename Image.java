@@ -11,9 +11,9 @@ public class Image
 {
 
 static Color color=randomColorMatt(70);// new Color(71,13,41);//
-static double faintness=6,range=8;
-static int filling=3, black=Color.black.getRGB(), denseness=4, dotsize=20,
-width=2560*5,height=1440*5;//1080,height=1080;
+static double faintness=8,range=10;
+static int filling=4, black=Color.black.getRGB(), denseness=5, dotsize=100,
+width=2560*5,height=1440*5;//1080,height=1080;//
 static boolean empty=false;
 static String format="png",name= "honey668";
 static BufferedImage image;
@@ -27,7 +27,7 @@ public static void main(String[] args)
 	Observer.format="png";
 	Honeycomb.empty=empty;  
 	Honeycomb.filling=filling;  
-	Honeycomb.denseness=denseness;double sqrt=Math.sqrt(4);
+	Honeycomb.denseness=denseness;double sqrt=Math.sqrt(7);
 	Point.still=false;
 
 
@@ -44,12 +44,12 @@ public static void main(String[] args)
 		zBuffer=eye.InitiateBuffer();
 		Observer.background=color;
 		// new int[] {m,n,k,k,m,n},new int[] {0,0,0,0},//symm
-		// new int[] {8,8,8,6,6,6},new int[] {0,1,1,1}, //pyramid
+		// new int[] {8,8,8,6,6,6},new int[] {0,1,1,1}, //pyramid 
 		//new int[] {m,n,k,l,m,n},new int[] {0,1,1,0}// one differs
 		//new int[] {m,m,k,l,n,n},new int[] {0,1,1,2} //squeeze
-		Honeycomb comb=Polychoron.modify("rect",5,3,4,faintness);//rectify regular tiling
-		//Polychoron.tilingnce(5,3,5,faintness);//regular tiling n-gons, c meeting per corner, e per edge
-		//Polychoron.archimedean("pyramid", new int[] {8,8,6,6,3,4,6,4},new int[] {0,1,1,2,2},faintness); 
+		Honeycomb comb=//Polychoron.modify("rect",5,3,5,faintness);//rectify regular tiling
+		////Polychoron.tilingnce(5,3,5,faintness);//regular tiling n-gons, c meeting per corner, e per edge
+		Polychoron.archimedean("pyramid", new int[] { 8,8,8,8,8,3,3,3,3,3},new int[] {0,1,1,1,1,1},faintness); 
 
 		Observer.range=range;
 		zBuffer=eye.InitiateBuffer();   

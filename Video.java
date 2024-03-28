@@ -21,7 +21,7 @@ public class Video
 			range=5.3;//6.25;//2; 
 	static String name="tetrahedron",//"honey",//"honeycomb",// "edge",//
 			format="png";
-	static Color color=new Color(166,162,98);//randomColorMatt(70); //
+	static Color color=randomColorMatt(70); //new Color(166,162,98);//
 
 
 public static void main(String[] args)
@@ -45,7 +45,7 @@ public static void main(String[] args)
 	Point.still=false;
 	
 	DecimalFormat df=new DecimalFormat("0000"); 
-	Honeycomb honey=Polychoron.archimedean("pyramid", new int[] {10,10,10,10,10,3,3,3,3,3},new int[] {0,1,1,1,1,1},  faintness);
+	Honeycomb honey=Polychoron.archimedean("pyramid", new int[] {6,6,6,6,3,4,4,4},new int[] {0,1,1,2,2},  faintness);
 					//Polychoron.tilingnce(4,4,3,6);//(7,3,5,faintness);//
 					//Polychoron.modify("rect",6,3,3,faintness);//
 

@@ -996,7 +996,7 @@ public class Polychoron
 						}
 						 honey.addFace(center,sidepoint);
 						 
-				//int drawIt=5000;	if(honey.sidepoint.size()%drawIt==0) {	honey.drawFaces(Image.eye, Image.image, Image.zBuffer, Image.color,drawIt);		Image.eye.finish(Image.image, "hrrect534");}
+			//	int drawIt=5000;	if(honey.sidepoint.size()%drawIt==0) {	honey.drawFaces(Image.eye, Image.image, Image.zBuffer, Image.color,drawIt);		Image.eye.finish(Image.image, "hrpyr8888833333");}
 					}
 					
 				}
@@ -1309,6 +1309,26 @@ public class Polychoron
 		if(Math.abs(v)>1)return 0;
 		else return Math.sqrt(1-v*v);
 	}
+	
+	public static Cellcomplex cantellate(Cellcomplex original)
+	{
+		int[]v=new int[10];
+		int counter=0;
+		for(int i=0;i<original.sidepoint.length;i++)
+		{
+			boolean done=false;
+			int j=0;
+			while(j<original.sidepoint[i].length&&!done)
+			{
+				if(original.sidepoint[i][j]==0)done=true;
+			}
+			if(done)
+			{
+				v
+			}
+		}
+	}
+	
 	
 	//only works if uniform-->if all edges of original ar identical
 	public static Cellcomplex rectify(Cellcomplex original)
