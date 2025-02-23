@@ -1,3 +1,5 @@
+package Hyperbolic;
+
 //***************************************************
 // E4.java
 // @author Non-Euclidean Dreamer

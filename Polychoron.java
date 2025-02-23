@@ -294,7 +294,7 @@ public class Polychoron
 		while(k<honey.vertex.size())
 		{	
 			if(honey.getVertex(k).isIn())//(doit.get(k))
-		{System.out.println("k="+k+", distance="+Point.zero.distance(honey.vertex.get(k)));
+		{//System.out.println("k="+k+", distance="+Point.zero.distance(honey.vertex.get(k)));
 			int i,j;
 			int[] pointedge=honey.pointedge.get(k);
 			boolean draw=false;
@@ -925,7 +925,7 @@ public class Polychoron
 					//	honey.vertex.get(mid[it]).print();
 					//	honey.vertex.get(nju[it]).print();
 						Point p=new Line( honey.vertex.get(nju[it]),w,s).location(1);
-						p.print();
+				//		p.print();
 				//	System.out.println("center to vertex="+p.distance(center));
 					//	System.out.println("s "+s);
 						int count=0, done=-1;int edge=honey.pointedge.get(nju[it])[count];
@@ -1215,7 +1215,7 @@ public class Polychoron
 					//	honey.vertex.get(mid[it]).print();
 					//	honey.vertex.get(nju[it]).print();
 						Point p=new Line( honey.vertex.get(nju[it]),w,s).location(1);
-						p.print();
+					//	p.print();
 				//	System.out.println("center to vertex="+p.distance(center));
 					//	System.out.println("s "+s);
 						int count=0, done=-1;int edge=honey.pointedge.get(nju[it])[count];
@@ -1324,7 +1324,7 @@ public class Polychoron
 			}
 			if(done)
 			{
-				v
+				
 			}
 		}
 	}

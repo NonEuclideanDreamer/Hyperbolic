@@ -18,7 +18,7 @@ public class Point
 	public double y; 
 	public double z; 
 	public int color; // Determines the color of the point as an rgb-value
-
+	public boolean ideal;
 	public static boolean still; //if true, "isIn" checks whether the Point is visible for the Observer in the Image-class, else it checks if it's within Observer.range of zero
 	
 	//****************************************************
@@ -184,9 +184,9 @@ public class Point
 	//*******************************************
 	public Minkowski toMinkowski()
 	{
-		
-		Minkowski min=new Minkowski (x,y,z,Math.sqrt(1+x*x+y*y+z*z),color);
-		return min;
+		if(ideal) return  new Minkowski (x,y,z,0,color);
+		else	return new Minkowski (x,y,z,Math.sqrt(1+x*x+y*y+z*z),color);
+	
 	}
 	
 	//********************************************
@@ -203,8 +203,14 @@ public class Point
 		{
 			return 0;
 		}
-		else
-		return Math.acos((-Math.cosh(base)+Math.cosh(leg1)*Math.cosh(leg2))/Math.sinh(leg1)/Math.sinh(leg2));
+		else {
+			double out=(-Math.cosh(base)+Math.cosh(leg1)*Math.cosh(leg2))/Math.sinh(leg1)/Math.sinh(leg2);
+			if(out<-1) {//System.out.println("acos"+out);
+			out=-1;}
+			else if(out>1) {//System.out.println("acos"+out);
+				out=1;}
+			
+		return Math.acos(out);}
 	}
 
 	//********************************************
@@ -261,7 +267,7 @@ public class Point
 	//******************************************
 	// Prints the Coordinates of the point going to a new line after
 	//******************************************
-	public void println()
+	public void println(int i)
 	{
 		System.out.println("point: ("+x+", "+y+", "+z+")");
 	}
@@ -269,7 +275,7 @@ public class Point
 	//******************************************
 	// Prints the Coordinates of the point 
 	//******************************************
-	public void print()
+	public void print(int i)
 	{
 		System.out.print("point: ("+x+", "+y+", "+z+")");
 	}
@@ -359,6 +365,25 @@ public class Point
 			return Image.eye.drawPoint(Image.image, Image.zBuffer, this)<Observer.range;
 		}
 		else return distance(zero)<Polychoron.faintness;
+	}
+
+	public int[] toScreen(Observer eye) {
+		int xPixel, yPixel,front=1;
+		Minkowski direction=eye.position().direction(this);
+		double radial=Math.abs(eye.getForward().angle(this)),alpha,
+		depth=distance(eye.position());
+		
+		if (radial>=Math.PI/2)
+		{
+			front=0;
+		}
+		alpha=Math.signum(eye.position().toMinkowski().det(eye.direction(), eye.right, direction))*eye.getRightward().angle(direction.hnormcomp(eye.getForward()).hnormalize()); //think about sign!
+		xPixel=eye.width/2+(int) Math.round((Math.cos(alpha)*eye.screenDistance*Math.tan(radial)));
+		yPixel=eye.height/2-(int) Math.round((Math.sin(alpha)*eye.screenDistance*Math.tan(radial)));
+		if(Double.isInfinite(radial)||Double.isNaN(radial))front=0;
+//	if(0==Math.sin(alpha)*eye.screenDistance*Math.tan(radial)&&0==((Math.cos(alpha)*eye.screenDistance*Math.tan(radial))))front=0;
+	//	System.out.println(xPixel+", "+yPixel);
+		return new int[] {xPixel,yPixel,front};
 	}
 
 }

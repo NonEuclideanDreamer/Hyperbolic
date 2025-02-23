@@ -216,7 +216,7 @@ public class Observer
 		//	System.out.println("depth="+depth+", angle="+alpha+", radial="+radial+", pointradius="+pointradius);
 		//		System.out.println("Point at "+xPixel+","+yPixel);
 			int color=combine( point.getColor(),background,depth);
-			if(yPixel!=height/2 || xPixel!=width/2)
+			if(yPixel!=height/2)// || xPixel!=width/2)
 			for(int i=yPixel-(int)pointradius;i<yPixel+pointradius;i++)
 			{
 				double r= Math.sqrt(Math.pow(pointradius,2)-Math.pow(yPixel-i,2));

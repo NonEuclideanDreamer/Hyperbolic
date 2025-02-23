@@ -3,8 +3,12 @@
 // @author Non-Euclidean Dreamer
 // Represents one geodesic in H^3 by a Point a normalized Minkowski Vector as direction and a speed
 //**********************************************************************
+package Hyperbolic;
+
 import java.awt.Color;
 import java.util.Random;
+
+
 
 public class Line 
 {

@@ -10,20 +10,20 @@ import java.util.ArrayList;
 
 public class Honeycomb 
 {
-	static double denseness=10;
+	static double denseness=10; //How densely are the faces drawn
 	static Cellcomplex vf;//vertexfigure
 	static double[][]vfd;//vertexfigure distances
 	static int[] edgetype;//are there "equivalent edges" in the vertexfigure?
-	static int filling=3;
-	static boolean empty=false;
-	ArrayList<Point> vertex=new ArrayList<Point>(),
-	 center=new ArrayList<Point>();
-	ArrayList< int[]> edgepoint=new ArrayList<int[]>(),
-		sidepoint=new ArrayList<int[]>(),
-		pointedge=new ArrayList<int[]>(),
-		pointside=new ArrayList<int[]>(),
-		sideedge=new ArrayList<int[]>(),
-		edgeside=new ArrayList<int[]>();
+	static int filling=3; //How much of the faces is drawn
+	static boolean empty=false; // is the middle of the faces drawn
+	ArrayList<Point> vertex=new ArrayList<Point>(), //vertices of the honeycomb
+	 center=new ArrayList<Point>();					//centers of the faces of the honeycomb
+	ArrayList< int[]> edgepoint=new ArrayList<int[]>(),//which vertices belong to which edges
+		sidepoint=new ArrayList<int[]>(),			//which vertices belong to which faces
+		pointedge=new ArrayList<int[]>(),			//which edges meet at which vertex
+		pointside=new ArrayList<int[]>(),			//which faces meet at which vertex
+		sideedge=new ArrayList<int[]>(),			//which edges surround which face
+		edgeside=new ArrayList<int[]>();			// which faces meet at which edge
 		
 //************************************************************	
 // Add vertex with empty(-1) array for adjoining edges & faces
@@ -32,7 +32,7 @@ public class Honeycomb
 		{
 			int out=vertex.size();
 			
-			point.print();
+		//	point.print();
 			
 			vertex.add(point);
 			pointedge.add(minarray(nedge));
@@ -49,8 +49,7 @@ public class Honeycomb
 		{
 			int n=edgepoint.size();
 		//	System.out.println("new edge nr"+n+":"+i+", "+j+" ,length="+vertex.get(i).distance(vertex.get(j)));
-		//	System.out.println("new edge nr"+n+":"+i+", "+j+" ,length="+vertex.get(i).distance(vertex.get(j)));
-
+			
 			edgepoint.add(new int[] {i,j});
 			/*if(pointedge.get(i)[0]==-1)	pointedge.get(i)[0]=n;
 			else
@@ -196,7 +195,7 @@ public class Honeycomb
 			{
 				Point v=vertex.get(i);
 				v.setColor(v.standardcolor().getRGB());
-				v.println();
+				//v.println();
 				eye.drawPoint(image, zBuffer, v);//, radius, perforation
 			}
 		}
@@ -242,16 +241,16 @@ public class Honeycomb
 		//Draw Edges to image
 		//**********************
 
-			public void drawEdges(Observer eye,BufferedImage image,double[][] zBuffer,Color background)
-	{
-		Line line;
-		for(int i=0;i<edgepoint.size();i++)
+		public void drawEdges(Observer eye,BufferedImage image,double[][] zBuffer,Color background)
 		{
-			line=vertex.get(edgepoint.get(i)[0]).geodesic(vertex.get(edgepoint.get(i)[1]));
-			line.setColor((line.location(0.5).standardcolor()));
-			eye.drawLine(image, zBuffer, line, 1);
+			Line line;
+			for(int i=0;i<edgepoint.size();i++)
+			{
+				line=vertex.get(edgepoint.get(i)[0]).geodesic(vertex.get(edgepoint.get(i)[1]));
+				line.setColor((line.location(0.5).standardcolor()));
+				eye.drawLine(image, zBuffer, line, 1);
+			}
 		}
-	}
 			
 			
 			//********************
@@ -296,7 +295,7 @@ public class Honeycomb
 
 
 
-
+			//return said vertex
 			Point getVertex(int i) 
 			{
 				return vertex.get(i);
@@ -304,7 +303,7 @@ public class Honeycomb
 
 
 
-//draws last "amount" of faces
+			//draws last "amount" of faces
 			public void drawFaces(Observer eye, BufferedImage image, double[][] zBuffer, Color background, int amount) 
 			{
 				Line[] tocenter;
@@ -341,6 +340,7 @@ public class Honeycomb
 				}
 			}
 			
+			// at which slot of the pointedge array is edge nr "edge" of vertex nr "vertex" for its other end
 			public int getAltEdgeNr(int vertex,int edge)
 			{
 				int other=getEndCor(vertex,edge);
@@ -353,7 +353,7 @@ public class Honeycomb
 			return -1;
 			}
 
-
+			// "archedge" as in "archenemy"? I don't remember
 			public void addarchEdge(int i, int j, int et) 
 			{
 				int n=edgepoint.size();
@@ -628,4 +628,146 @@ public class Honeycomb
 						else k++;
 					}
 				}
+
+			//**************************************************************************
+			// Color corresponds to the number of faces the line of sight passes through
+			//****************************************************************************
+			public void fractaldraw(Observer eye, BufferedImage image, int[][] zBuffer) {
+				for(int i=0;i<center.size();i++)
+				{
+					int[][]vertex=new int[sidepoint.get(i).length][3];
+					int[]c=center.get(i).toScreen(eye);
+					for(int j=0;j<sidepoint.get(i).length;j++)
+					{
+						vertex[j]=this.vertex.get(sidepoint.get(i)[j]).toScreen(eye);
+					}
+					fillPolygon(zBuffer,eye,i);
+				}
+				Fractal.draw(image,zBuffer);
+			}
+
+			//***************************************************************
+			// Drawing a filled polygon via winding number, too slow for CPU
+			//***************************************************************
+			private void fillTriangle(int[] c, int[][] v, double[][] zBuffer) 
+			{
+				boolean[][]f=new boolean[zBuffer.length][zBuffer[0].length];
+				boolean in=true;
+				for(int i=0;i<v.length;i++)if(v[i][2]==0)in=false;
+				if(!in)return;
+				for(int x=0;x<zBuffer.length;x++)
+					for(int y=0;y<zBuffer[0].length;y++)
+					{
+						double alpha=0;
+						double[]ang=new double[v.length];
+						for(int i=0;i<v.length;i++)
+						{
+							ang[i]=Math.atan2(v[i][1]-y, v[i][0]-x);
+							if(v[i][2]==0)ang[i]=(ang[i]+2*Math.PI)%(2*Math.PI)-Math.PI;
+						}
+						for(int i=0;i<v.length;i++)
+						{
+							int j=(i+1)%v.length;
+							double a=ang[j]-ang[i];
+							if(a>Math.PI)a-=2*Math.PI;
+							else if(a<-Math.PI)a+=2*Math.PI;
+							alpha+=a;
+						}
+						if(Math.abs(alpha)>1)zBuffer[x][y]+=1;
+					}
+				
+			}
+			
+			//****************************************************
+			// for fractaldraw. adds 1 to each pixel of the face
+			//****************************************************
+			public void fillPolygon(int[][]Buffer, Observer eye,int face)//to be reconsidered for concave tiles
+			{
+				int width=Buffer.length,height=Buffer[0].length;
+			
+				boolean[][]canvas=new boolean[width][height];
+				int[] one=center.get(face).toScreen(eye),two,three;
+				int[]sp=sidepoint.get(face);
+				int[][]v=new int[sp.length][3];
+				boolean allin=true;
+	
+				for (int i=0;i<sp.length;i++)
+				{
+					v[i]=vertex.get(sp[i]).toScreen(eye);
+					if(v[i][2]==0)allin=false;
+				}
+				if(allin)
+				for (int i=0;i<sp.length;i++)
+				{
+					//System.out.println("in");
+					two=v[i];
+					three=v[(i+1)%sp.length];
+				
+					drawTriangle(one,two,three,canvas,Buffer);
+				}
+			//	else System.out.println("out");
+//
+			}
+
+			//**********************************************************************************************************************
+			// for fractaldraw, fills a single triangle, making sure we don't double down on pixels between two triangle of the face
+			//**********************************************************************************************************************
+			private void drawTriangle(int[] v1, int[] v2, int[] v3, boolean[][] canvas, int[][]Buffer) {
+				int[]one=v1,two=v2,three=v3;
+				if(v1[1]>v2[1])
+				{
+					if(v1[1]<v3[1])
+					{
+						two=v1;one=v2;
+					}
+					else if(v3[1]<v2[1])
+					{
+						one=v3;three=v1;
+					}
+					else
+					{
+						one=v2;two=v3;three=v1;
+					}
+				}
+				else if(v1[1]>v3[1])
+				{
+					one=v3;two=v1;three=v2;
+				}
+				else if(v2[1]>v3[1])
+				{
+					two=v3;three=v2;
+				}
+				int sign=(int)Math.signum((two[0]-one[0])*(three[1]-one[1])-(three[0]-one[0])*(two[1]-one[1]));//System.out.print("drawTriangle");
+				//System.out.println(one[0]+","+two[0]+","+three[0]);
+				//if(two[0]<three[0])sign=-1;
+				if(sign==0) {}//System.out.println("sign==0");
+				else
+				{
+				for(int y=Math.max(0, one[1]);y<Math.min(canvas.length, two[1]);y++)
+				{
+					int x1=one[0]+(three[0]-one[0])*(y-one[1])/(three[1]-one[1]),x2=one[0]+(two[0]-one[0])*(y-one[1])/(two[1]-one[1]);
+					//sign=(int) Math.signum(x2-x1);//if(two[1]==three[1])//System.out.println(x1+"<"+x2);
+					for(int x=x1;sign*x<sign*(x2)+1;x+=sign)
+					{
+						try{
+							if(! canvas[x][y]) {Buffer[x][y]++;
+								canvas[x][y]=true; 
+							}
+						}
+						catch(ArrayIndexOutOfBoundsException e){}
+					}
+				}
+				
+				for(int y=Math.max(0, two[1]);y<Math.min(canvas.length, three[1]);y++)
+				{
+					int x1=one[0]+(three[0]-one[0])*(y-one[1])/(three[1]-one[1]), x2=two[0]+(three[0]-two[0])*(y-two[1])/(three[1]-two[1]);//sign=(int) Math.signum(x2-x1);
+					for(int x=x1;sign*x<sign*(x2)+1;x+=sign)
+					{
+						try{	if(! canvas[x][ y]) {Buffer[x][y]++;
+						canvas[x][ y]=true; 
+					}}catch(ArrayIndexOutOfBoundsException e){}
+					}}
+				}//System.out.println();
+			}
+			
 }
